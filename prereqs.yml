@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   labels:
     app: httpbin
+    route: multiapp.example.com
   name: httpbin
 spec:
   replicas: 3
@@ -13,6 +14,7 @@ spec:
     metadata:
       labels:
         app: httpbin
+        route: multiapp.example.com
     spec:
       containers:
       - image: cfrouting/httpbin
@@ -40,6 +42,7 @@ kind: Deployment
 metadata:
   labels:
     app: proxy
+    route: multiapp.example.com
   name: proxy
 spec:
   replicas: 3
@@ -50,6 +53,7 @@ spec:
     metadata:
       labels:
         app: proxy
+        route: multiapp.example.com
     spec:
       containers:
       - image: cfrouting/proxy
