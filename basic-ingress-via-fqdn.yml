@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: httpbin
+  labels:
+    app: httpbin
+spec:
+  rules:
+  - host: httpbin.example.com
+    http:
+      paths:
+      - backend:
+          serviceName: httpbin
+          servicePort: 80
+
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: proxy
+  labels:
+    app: proxy
+spec:
+  rules:
+  - host: proxy.network
+    http:
+      paths:
+      - backend:
+          serviceName: proxy
+          servicePort: 80
