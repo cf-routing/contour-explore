@@ -118,7 +118,53 @@ kubectl delete -f multiple-apps-to-route.yml
 have to create a single service that selects all the apps. This means **only
 round-robin balancing** and **no weighted routing** of any kind. It also means we will
 have to label app pods with all the routes that select them which is an exciting
-kind of nightmare.
+kind of nightmare. However, Contour's own `HTTPProxy` resource does support
+multiple backends and weighted routing, so we could use that.
 
 ## Encryption and authentication between the client and gateway (TLS at a minimum)
-## Mutual authentication between LB and gateway
+
+Apply resources:
+```
+kubectl apply -f tls.yml
+```
+
+Test:
+```
+curl -k --resolve tls.example.com:443:$EXTERNAL_IP https://tls.example.com/anything
+```
+
+Clean up:
+```
+kubectl delete -f tls.yml
+```
+
+## Mutual authentication between client and gateway
+
+Install HTTPProxy CRD:
+```
+kubectl apply -f https://raw.githubusercontent.com/projectcontour/contour/release-1.8/examples/contour/01-crds.yaml
+```
+
+Apply resources:
+```
+kubectl apply -f mtls.yml
+```
+
+Test:
+```
+curl --key certs/client.key --cert certs/client.crt -k --resolve mtls.example.com:443:$EXTERNAL_IP https://mtls.example.com/anything
+```
+
+Clean up:
+```
+kubectl delete -f mtls.yml
+```
+
+**Notes**: This is not possible with Kubernetes `Ingress` objects (yet?) so we
+had to install the HTTPProxy CRD. This may mean that we can't use `Ingress`, at
+least until it supports client certificate validation. Some other ingress
+systems (notably nginx-ingress) use annotations on the `Ingress` object to
+specify the client secret, and
+[Contour](https://projectcontour.io/docs/main/annotations/) supports that
+pattern, so we may be able to ask them to add client validation fields as
+options there.
